@@ -13,6 +13,7 @@ import (
 type Config struct {
 	Redis    *redis.Options
 	Postgres *pgxpool.Config
+	CodeLen  int
 }
 
 func LoadConfig() *Config {
@@ -52,5 +53,13 @@ func LoadConfig() *Config {
 	pg.MaxConns = int32(maxConns)
 	pg.MinConns = int32(minConns)
 
-	return &Config{Redis: r, Postgres: pg}
+	codeLenStr := os.Getenv("CODE_LEN")
+
+	codeLen, err := strconv.Atoi(codeLenStr)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return &Config{Redis: r, Postgres: pg, CodeLen: codeLen}
 }
