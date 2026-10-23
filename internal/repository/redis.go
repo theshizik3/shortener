@@ -35,3 +35,7 @@ func (r *RedisRepo) GetClicks(ctx context.Context, code string) (int, error) {
 func (r *RedisRepo) GetDelClicks(ctx context.Context, code string) (int, error) {
 	return r.client.GetDel(ctx, "clicks:"+code).Int()
 }
+
+func (r *RedisRepo) ScanClicks(ctx context.Context) *redis.ScanIterator {
+	return r.client.Scan(ctx, 0, "clicks:*", 100).Iterator()
+}

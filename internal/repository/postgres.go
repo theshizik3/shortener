@@ -60,7 +60,7 @@ func (r *PostgresRepo) DelCode(ctx context.Context, code string) error {
 	return err
 }
 
-func (r *PostgresRepo) IncrClick(ctx context.Context, code string, count int) error {
+func (r *PostgresRepo) IncrClicks(ctx context.Context, code string, count int) error {
 	_, err := r.pool.Exec(ctx, "UPDATE Links SET clicks = clicks + $1 WHERE code = $2", count, code)
 	return err
 }
