@@ -11,7 +11,7 @@ func generateCode(n int) (string, error) {
 	res := make([]byte, n)
 	alphabet_len := len(alphabet)
 	max := big.NewInt(int64(alphabet_len))
-	for i := 0; i < alphabet_len; i++ {
+	for i := 0; i < n; i++ {
 		idx, err := rand.Int(rand.Reader, max)
 		if err != nil {
 			return "", err
