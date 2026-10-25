@@ -48,7 +48,11 @@ func (s *Service) GetUrl(ctx context.Context, code string) (string, error) {
 }
 
 func (s *Service) SetUrl(ctx context.Context, url string) (string, error) {
-	code, err := generateCode(s.code_len)
+	code, err := s.postgresRepo.GetCode(ctx, url)
+	if err == nil {
+		return code, nil
+	}
+	code, err = generateCode(s.code_len)
 	if err != nil {
 		return "", err
 	}
