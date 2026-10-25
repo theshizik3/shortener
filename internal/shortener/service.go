@@ -2,6 +2,8 @@ package shortener
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/theshizik3/shortener/internal/repository"
 )
@@ -18,6 +20,18 @@ func NewService(redisRepo *repository.RedisRepo, postgresRepo *repository.Postgr
 		postgresRepo: postgresRepo,
 		code_len:     code_len,
 	}
+}
+
+func (s *Service) ValidateCode(code string) error {
+	if len(code) != s.code_len {
+		return fmt.Errorf("invalid code length: want %d, got %d", s.code_len, len(code))
+	}
+	for i := 0; i < len(code); i++ {
+		if !strings.ContainsRune(alphabet, rune(code[i])) {
+			return fmt.Errorf("invalid code: must be base62")
+		}
+	}
+	return nil
 }
 
 func (s *Service) GetUrl(ctx context.Context, code string) (string, error) {
@@ -43,4 +57,20 @@ func (s *Service) SetUrl(ctx context.Context, url string) (string, error) {
 		return "", err
 	}
 	return code, nil
+}
+
+func (s *Service) DeleteUrl(ctx context.Context, code string) error {
+	return s.postgresRepo.DelCode(ctx, code)
+}
+
+func (s *Service) GetClicks(ctx context.Context, code string) (int, error) {
+	pg_clicks, err := s.postgresRepo.GetClicks(ctx, code)
+	if err != nil {
+		return 0, err
+	}
+	redis_clicks, err := s.redisRepo.GetClicks(ctx, code)
+	if err != nil {
+		return 0, err
+	}
+	return pg_clicks + redis_clicks, nil
 }
