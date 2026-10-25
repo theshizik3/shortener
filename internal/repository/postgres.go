@@ -34,7 +34,7 @@ func (r *PostgresRepo) Init(ctx context.Context) error {
 			id SERIAL PRIMARY KEY,
 			code TEXT NOT NULL UNIQUE,
 			url TEXT NOT NULL UNIQUE,
-			clicks BIGINT NOT NULL DEFAULT 0,
+			clicks BIGINT NOT NULL DEFAULT 0
 		)`,
 	)
 	return err
@@ -44,10 +44,7 @@ func (r *PostgresRepo) GetUrl(ctx context.Context, code string) (string, error) 
 	var url string
 	row := r.pool.QueryRow(ctx, "SELECT url FROM Links WHERE code = $1", code)
 	err := row.Scan(&url)
-	if err != nil {
-		return "", err
-	}
-	return url, nil
+	return url, err
 }
 
 func (r *PostgresRepo) SetUrl(ctx context.Context, code, url string) error {
