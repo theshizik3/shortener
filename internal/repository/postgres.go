@@ -61,3 +61,17 @@ func (r *PostgresRepo) IncrClicks(ctx context.Context, code string, count int) e
 	_, err := r.pool.Exec(ctx, "UPDATE Links SET clicks = clicks + $1 WHERE code = $2", count, code)
 	return err
 }
+
+func (r *PostgresRepo) GetClicks(ctx context.Context, code string) (int, error) {
+	var clicks int
+	row := r.pool.QueryRow(ctx, "SELECT clicks FROM Links WHERE code = $1", code)
+	err := row.Scan(&clicks)
+	return clicks, err
+}
+
+func (r *PostgresRepo) GetCode(ctx context.Context, url string) (string, error) {
+	var code string
+	row := r.pool.QueryRow(ctx, "SELECT code FROM Links WHERE url = $1", url)
+	err := row.Scan(&code)
+	return code, err
+}
