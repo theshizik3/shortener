@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/joho/godotenv"
@@ -11,9 +12,10 @@ import (
 )
 
 type Config struct {
-	Redis    *redis.Options
-	Postgres *pgxpool.Config
-	CodeLen  int
+	Redis         *redis.Options
+	Postgres      *pgxpool.Config
+	CodeLen       int
+	FlushInterval time.Duration
 }
 
 func LoadConfig() *Config {
@@ -61,5 +63,13 @@ func LoadConfig() *Config {
 		panic(err)
 	}
 
-	return &Config{Redis: r, Postgres: pg, CodeLen: codeLen}
+	flushIntervStr := os.Getenv("FLUSH_INTERVAL")
+
+	flushInterval, err := strconv.Atoi(flushIntervStr)
+
+	if err != nil {
+		panic(err)
+	}
+
+	return &Config{Redis: r, Postgres: pg, CodeLen: codeLen, FlushInterval: time.Second * time.Duration(flushInterval)}
 }

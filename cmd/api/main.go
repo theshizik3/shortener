@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/theshizik3/shortener/internal/config"
+	"github.com/theshizik3/shortener/internal/flusher"
 	"github.com/theshizik3/shortener/internal/httpapi"
 	"github.com/theshizik3/shortener/internal/repository"
 	"github.com/theshizik3/shortener/internal/shortener"
@@ -20,10 +21,13 @@ func main() {
 	}
 
 	service := shortener.NewService(redis_repo, postgres_repo, cfg.CodeLen)
+	fl := flusher.NewFlusher(cfg.FlushInterval, redis_repo, postgres_repo)
 
 	ctrl := httpapi.NewController(service)
 
 	r := httpapi.SetupRouter(ctrl)
+
+	go fl.Run(context.Background())
 
 	r.Run(":8080")
 }
