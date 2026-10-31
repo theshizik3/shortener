@@ -2,6 +2,7 @@ package flusher
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	"github.com/theshizik3/shortener/internal/repository"
@@ -20,7 +21,7 @@ func NewFlusher(t time.Duration, redisRepo *repository.RedisRepo, postgresRepo *
 func (f *Flusher) flush(ctx context.Context) error {
 	iter := f.redisRepo.ScanClicks(ctx)
 	for iter.Next(ctx) {
-		key := iter.Val()
+		key := strings.TrimPrefix(iter.Val(), repository.ClicksKeyPrefix)
 		clicks, err := f.redisRepo.GetDelClicks(ctx, key)
 		if err != nil {
 			return err
