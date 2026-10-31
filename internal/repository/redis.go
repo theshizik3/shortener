@@ -31,11 +31,25 @@ func (r *RedisRepo) IncrClick(ctx context.Context, code string) error {
 }
 
 func (r *RedisRepo) GetClicks(ctx context.Context, code string) (int, error) {
-	return r.client.Get(ctx, ClicksKeyPrefix+code).Int()
+	clicks, err := r.client.Get(ctx, ClicksKeyPrefix+code).Int()
+	if err != nil {
+		if err == redis.Nil {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return clicks, nil
 }
 
 func (r *RedisRepo) GetDelClicks(ctx context.Context, code string) (int, error) {
-	return r.client.GetDel(ctx, ClicksKeyPrefix+code).Int()
+	clicks, err := r.client.GetDel(ctx, ClicksKeyPrefix+code).Int()
+	if err != nil {
+		if err == redis.Nil {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return clicks, nil
 }
 
 func (r *RedisRepo) ScanClicks(ctx context.Context) *redis.ScanIterator {

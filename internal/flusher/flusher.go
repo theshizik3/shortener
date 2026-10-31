@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	"github.com/redis/go-redis/v9"
 	"github.com/theshizik3/shortener/internal/repository"
 )
 
@@ -24,12 +23,9 @@ func (f *Flusher) flush(ctx context.Context) error {
 		key := iter.Val()
 		clicks, err := f.redisRepo.GetDelClicks(ctx, key)
 		if err != nil {
-			if err == redis.Nil {
-				continue
-			}
 			return err
 		}
-		f.postgresRepo.IncrClicks(ctx, key, clicks)
+		err = f.postgresRepo.IncrClicks(ctx, key, clicks)
 	}
 	return nil
 }

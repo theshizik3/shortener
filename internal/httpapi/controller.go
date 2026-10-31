@@ -2,7 +2,6 @@ package httpapi
 
 import (
 	"context"
-	"fmt"
 	"net/url"
 
 	"github.com/gin-gonic/gin"
@@ -75,7 +74,6 @@ func (ctrl *Controller) MakeLink(c *gin.Context) {
 	code, err := ctrl.s.SetUrl(context.Background(), c.PostForm("url"))
 	if err != nil {
 		c.JSON(500, gin.H{"success": false, "error": "internal error"})
-		fmt.Println(err)
 		return
 	}
 	c.JSON(201, gin.H{"success": true, "code": code})
